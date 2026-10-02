@@ -5,6 +5,7 @@
 - **Provider:** Edureka
 - **Duration:** 7 hours
 - **Branch:** `course-01-building-autonomous-ai-agents`
+- **Status:** Completed
 
 ## Overview
 
@@ -23,7 +24,19 @@ Solutions live in [`assignments/`](assignments).
 
 | Assignment | Status |
 |---|---|
-| _To be added as the course progresses_ | — |
+| [Practical project — Single-agent response model](assignments/simple-gpt-agent) | Completed |
+
+### Practical project: Single-agent response model
+
+This exercise demonstrates how one local GPT-based agent can accept natural-language input, select modular tools, execute tasks and maintain short-term session memory through the command line.
+
+The project includes three initial tools:
+
+- Text summarization.
+- Jokes and facts.
+- Basic weather information.
+
+It is intentionally implemented as a simple, extensible learning example without a user interface or database. It was executed locally with simulated responses, including tool selection and short-term memory checks.
 
 ## Notes
 

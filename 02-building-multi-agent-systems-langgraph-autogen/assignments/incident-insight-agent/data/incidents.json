@@ -1,0 +1,27 @@
+[
+  {
+    "id": "inc1",
+    "title": "Auth node token storm",
+    "description": "Auth service experienced token generation storm causing CPU spike and elevated latency."
+  },
+  {
+    "id": "inc2",
+    "title": "DB connection pool exhaustion",
+    "description": "Database connection pool exhausted leading to many connection errors and failed transactions."
+  },
+  {
+    "id": "inc3",
+    "title": "Load balancer saturation",
+    "description": "Load balancer reached max connections under traffic surge resulting in 502 errors."
+  },
+  {
+    "id": "inc4",
+    "title": "Cache miss cascade",
+    "description": "Cache misses increased suddenly after purge, causing backend DB overload and latency increases."
+  },
+  {
+    "id": "inc5",
+    "title": "Worker timeout storm",
+    "description": "Background workers timed out due to task queue backlog and downstream service slowness."
+  }
+]

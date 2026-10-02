@@ -5,6 +5,7 @@
 - **Provider:** Edureka
 - **Duration:** 8 hours
 - **Branch:** `course-03-ai-agent-orchestration-and-scaling`
+- **Status:** In progress
 
 ## Overview
 
@@ -27,4 +28,4 @@ Solutions live in [`assignments/`](assignments).
 
 ## Notes
 
-_Personal notes and takeaways._
+See [`NOTES.md`](NOTES.md) for the course summary and personal notes (in Spanish).

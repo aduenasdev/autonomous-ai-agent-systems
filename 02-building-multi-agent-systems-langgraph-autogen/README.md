@@ -23,8 +23,20 @@ Solutions live in [`assignments/`](assignments).
 
 | Assignment | Status |
 |---|---|
-| _To be added as the course progresses_ | — |
+| [Practical project — Real-time multi-agent coordinator](assignments/incident-insight-agent) | Completed |
+
+### Practical project: Real-time multi-agent coordinator
+
+This local CLI exercise demonstrates an incident analysis workflow with a single coordinating agent. It combines RAG-style retrieval from a local incident dataset, explainable AST-based heuristic rules, short-term memory and structured audit logging.
+
+The project was executed locally with simulated incidents and includes:
+
+- Historical incident retrieval with TF-IDF.
+- Safe rule evaluation through Python AST validation.
+- Recommendations based on incident severity.
+- Session memory for recent incidents.
+- Audit entries for retrieval, rule evaluation and decisions.
 
 ## Notes
 
-_Personal notes and takeaways._
+See [`NOTES.md`](NOTES.md) for my personal notes (in Spanish).
