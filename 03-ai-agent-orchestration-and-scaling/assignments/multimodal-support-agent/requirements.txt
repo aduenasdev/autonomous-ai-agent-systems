@@ -1,0 +1,13 @@
+flask
+langgraph
+pandas
+numpy
+astor
+loguru
+sentence-transformers
+faiss-cpu
+pillow
+pytesseract
+jsonschema
+flask-cors
+python-dotenv

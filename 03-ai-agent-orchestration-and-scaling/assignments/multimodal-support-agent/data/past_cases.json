@@ -1,0 +1,20 @@
+[
+  {
+    "id": "c1",
+    "title": "Gateway timeout ERR504",
+    "text": "Users see ERR504 when upstream service times out",
+    "resolution": "Restart upstream service; check network"
+  },
+  {
+    "id": "c2",
+    "title": "High CPU spike",
+    "text": "CPU usage > 90% when batch job runs",
+    "resolution": "Scale workers; optimize job"
+  },
+  {
+    "id": "c3",
+    "title": "Database connection errors",
+    "text": "DB connection timeouts and increased latency",
+    "resolution": "Check DB pool; increase connections"
+  }
+]

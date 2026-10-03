@@ -27,7 +27,9 @@ The program teaches how to design, build and manage intelligent AI agents that c
 |---|---|---|---|---|---|
 | 1 | [Building Autonomous AI Agents](https://www.coursera.org/learn/building-autonomous-ai-agents) | 7 h | [`01-building-autonomous-ai-agents`](01-building-autonomous-ai-agents) | `course-01-building-autonomous-ai-agents` | Completed |
 | 2 | [Building Multi-Agent Systems using LangGraph and Autogen](https://www.coursera.org/learn/building-multi-agent-systems-langgraph-autogen) | 8 h | [`02-building-multi-agent-systems-langgraph-autogen`](02-building-multi-agent-systems-langgraph-autogen) | `course-02-building-multi-agent-systems-langgraph-autogen` | Completed |
-| 3 | [AI Agent Orchestration and Scaling](https://www.coursera.org/learn/ai-agent-orchestration-and-scaling) | 8 h | [`03-ai-agent-orchestration-and-scaling`](03-ai-agent-orchestration-and-scaling) | `course-03-ai-agent-orchestration-and-scaling` | In progress |
+| 3 | [AI Agent Orchestration and Scaling](https://www.coursera.org/learn/ai-agent-orchestration-and-scaling) | 8 h | [`03-ai-agent-orchestration-and-scaling`](03-ai-agent-orchestration-and-scaling) | `course-03-ai-agent-orchestration-and-scaling` | Completed |
+
+All three courses are completed and the specialization certificate was earned on 2026-10-03.
 
 ## Repository workflow
 

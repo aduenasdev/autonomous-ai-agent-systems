@@ -1,170 +1,107 @@
 # Notas — AI Agent Orchestration and Scaling
 
-Resumen inicial del curso 3, centrado en orquestación con estado, razonamiento multimodal, memoria a largo plazo, gobernanza y escalado.
+Notas personales (en español) del curso 3. Organizadas por tema, no por orden de lección.
 
-## Resumen del curso
+## 1. Memoria a largo plazo (LTM) y replanificación
 
-El curso está orientado a pasar de flujos básicos de agentes a sistemas capaces de interpretar entradas visuales, conservar contexto a largo plazo, replanificar dinámicamente y operar de forma segura, auditable y escalable en producción.
+### Memoria episódica y semántica
 
-## Módulo 1: Entradas multimodales y orquestación con estado
+La LTM guarda experiencias, datos aprendidos y resultados de tareas, y **persiste entre sesiones** (la memoria a corto plazo solo dura una sesión).
 
-Este módulo introduce las máquinas de estados de LangGraph, el enrutamiento condicional y el razonamiento multimodal:
+| Tipo | Qué guarda | Permite |
+|---|---|---|
+| **Episódica** | Experiencias: diálogos, historiales de tareas, estados del entorno | Recordar «lo que ocurrió» |
+| **Semántica** | Conocimiento general: conceptos, relaciones, reglas de dominio | Razonar más allá de eventos aislados |
 
-- Diferenciar flujos digitales clásicos de agentes autónomos basados en estados.
-- Comprender el estado del grafo, los nodos, las aristas y la lógica de enrutamiento.
-- Construir y ejecutar un flujo de LangGraph de varios pasos.
-- Implementar clasificación de nivel 1 con rutas condicionales.
-- Usar modelos de visión para extraer códigos de error de capturas de pantalla.
-- Integrar APIs externas con datos de dispositivos, metadatos y señales de diagnóstico.
-- Crear un agente de triaje que combine texto, imágenes y señales del sistema.
+### Grafos de conocimiento (KG)
 
-**Resultado:** diseñar flujos de LangGraph con estado y agentes de triaje que se adapten a entradas visuales y señales en tiempo real.
+- Columna vertebral de la memoria semántica: **entidades** (usuarios, herramientas, errores) y **relaciones** (causas, dependencias, similitudes).
+- Recorrer el grafo permite encontrar experiencias relacionadas y la **causa raíz** de problemas recurrentes (p. ej. una configuración que falla siempre → avisar de forma preventiva).
+- Cada evento se guarda con embeddings contextuales (tarea, timestamp, éxito/fallo) y se enlaza en el KG. Consultar = **búsqueda semántica**.
 
-## Módulo 2: Memoria a largo plazo y replanificación dinámica
+### Recuperación e integración
 
-Este módulo aborda la memoria episódica y semántica, los grafos de conocimiento y la capacidad de ajustar planes:
+1. **Codificar** el contexto actual (vector o representación simbólica).
+2. **Coincidencia semántica:** búsqueda por similitud o recorrido del grafo.
+3. **Ranking** por recencia, tasa de éxito y solapamiento contextual.
 
-- Comprender el papel de la memoria a largo plazo (LTM).
-- Modelar relaciones entre usuario, dispositivo y errores mediante grafos de conocimiento.
-- Guardar nuevas experiencias y recuperar contexto histórico relevante.
-- Usar módulos de memoria de LlamaIndex para consolidación y filtrado.
-- Añadir nodos que decidan cuándo recuperar o guardar memoria.
-- Incorporar un agente planificador que adapte el flujo según el historial.
-- Crear motores de replanificación con bucles de retroalimentación.
-- Implementar subgrafos anidados para tareas complejas y jerárquicas.
-- Demostrar replanificación basada en LTM en flujos de varios pasos.
+Lo recuperado se **integra**, no se pega: el planificador decide si reutiliza una estrategia pasada o genera una nueva. La **consolidación** fusiona datos redundantes (módulos de memoria de LlamaIndex). Ventajas: continuidad, adaptabilidad y eficiencia.
 
-**Resultado:** crear agentes sensibles al contexto capaces de conservar experiencia y corregir dinámicamente sus planes.
+### Autocorrección y flujo dinámico
 
-## Módulo 3: Orquestación, gobernanza y escalabilidad
+- **Replanificación:** el nodo de replanificación detecta desvíos y actualiza el plan **sin reiniciar el workflow**.
+- **Feedback:** señales explícitas (valoraciones, correcciones) e implícitas (éxito de la interacción) se escriben en la LTM: refuerzan lo que funciona y restan prioridad a lo que falla.
+- **Subgrafos:** los objetivos complejos se dividen en subgrafos anidados, para replanificar una subtarea sin tocar la misión global.
 
-Este módulo prepara los agentes para producción empresarial:
+**Idea clave:** LTM + replanificación = paso de la autonomía reactiva a la proactiva.
 
-- Aplicar controles de seguridad a decisiones de alto riesgo.
-- Prevenir acciones autónomas irreversibles.
-- Integrar nodos de intervención humana en flujos sensibles.
-- Automatizar registros de auditoría y decisiones.
-- Exponer agentes mediante APIs Flask.
-- Desplegar flujos completos de LangGraph en entornos escalables.
-- Comparar agentes en el borde con orquestación centralizada en la nube.
-- Comprender contenedores y fundamentos de Kubernetes.
-- Conectar clasificación, memoria, planificación y herramientas en un agente de soporte.
-- Usar LangSmith para observabilidad, depuración y métricas de rendimiento.
-- Explorar optimización autónoma y flujos que se mejoran a sí mismos.
+## 2. Agente multimodal con estado
 
-**Resultado:** implementar sistemas regulados, observables, auditables y escalables para producción.
+### Visión y herramientas
 
-## Resumen y proyecto final
+- Un **LLM de visión** lee capturas (incluso borrosas o parciales) y, además de extraer el texto, lo **interpreta** (código de error → gravedad → acción).
+- El nodo de visión devuelve salida estructurada `{error_code, error_message, additional_context}` y, si la imagen no sirve, lo dice y sigue solo con texto.
+- Las herramientas externas (`check_system_status`, `query_inventory`, `validate_credentials`…) necesitan **contratos claros** (entradas, salidas, errores) y manejo de fallos: si una API da timeout, el agente continúa con un diagnóstico local.
 
-El curso unifica razonamiento multimodal, memoria a largo plazo, gobernanza, orquestación y escalado en un agente autónomo de soporte.
+### Orquestación de varias herramientas
 
-El proyecto final integra todos los módulos en un flujo de trabajo de principio a fin y se valida mediante pruebas y evaluaciones de autonomía, seguridad y fiabilidad. Al completarlo, el agente debe demostrar:
+- El orden de las herramientas es **dinámico**: tras cada llamada el agente razona «con lo que sé, ¿qué necesito después?». Si el RAG ya da una solución definitiva, se omite el check de estado.
+- Si fallan todas las vías, reconoce la laguna y **deriva a un humano**.
 
-- Continuidad contextual.
-- Replanificación dinámica.
-- Razonamiento visual.
-- Intervención humana y gobernanza.
-- Auditabilidad.
-- Despliegue fiable y escalable.
+### Flujo de un ticket
 
-## Fundamentos de LangGraph y State
+| Nodo | Aporta al estado |
+|---|---|
+| Visión | Código de error de la captura |
+| Clasificación | Categoría y gravedad (texto + imagen), con **puntuación de confianza** |
+| Enrutamiento | Alta gravedad → ruta urgente; baja → estándar |
+| Diagnóstico | Herramienta según categoría (auth, pagos, base de datos) |
+| Resolución | Respuesta que sintetiza todo el estado |
 
-### De la colaboración a la autonomía
+- Confianza alta: texto e imagen coinciden. Baja: se contradicen o faltan datos → revisión humana.
+- Si falta información (p. ej. una captura), el agente la pide.
 
-Los primeros agentes dependían de una persona para indicar cada siguiente paso. Eso es colaboración, no autonomía. Un agente autónomo gestiona su propio flujo de trabajo y decide qué hacer a continuación según el estado y las condiciones del proceso.
+### Por qué el estado importa
 
-LangGraph permite modelar estos flujos como grafos. Los agentes navegan entre estados y toman rutas según decisiones y condiciones, coordinando procesos complejos de varios pasos sin instrucciones manuales en cada etapa.
+| Sin estado | Con estado |
+|---|---|
+| Olvida el contexto y repite diagnósticos | Comprensión progresiva y referencias al contexto previo |
+| Pide al cliente repetir información | Conversaciones coherentes de varios turnos |
+| Guion rígido | Puede pausar, reanudar, volver atrás y escalar a un humano **conservando el contexto** |
 
-### Estado del grafo
+Además, una **interfaz de chat simulada** (con historial y estado visible: qué extrajo, qué herramientas usó, qué decidió) sirve para probar sin montar una interfaz de producción.
 
-El estado representa todo lo que el agente conoce en un momento del flujo y funciona como su memoria de trabajo. En un ticket de soporte puede contener:
+**Multimodal = más precisión e igualdad:** una captura es un hecho objetivo («botón desactivado») y ayuda tanto a quien sabe describir el problema como a quien no.
 
-- Identificador del cliente.
-- Descripción del problema.
-- Código de error extraído.
-- Resultados del diagnóstico.
-- Estado de resolución.
-- Historial de la conversación.
+## 3. Gobernanza, despliegue y escalado
 
-El estado se conserva al pasar de clasificación a diagnóstico y resolución. Debe definirse mediante un esquema estructurado y tipado, por ejemplo:
+### Gobernanza
 
-```python
-{
-    "customer_id": str,
-    "error_code": str,
-    "severity": int,
-    "resolved": bool,
-}
-```
+- **Irreversible Action Guardrails:** puntos de control que interceptan los workflows de alto riesgo antes de una acción irreversible.
+- **Human-in-the-loop (HITL):** el workflow se detiene hasta que un humano valida.
+- **Auditoría y linaje:** registro automático de cada decisión, resultado y transición de estado → cumplimiento y razonamiento explicable.
 
-Cada nodo puede añadir información: la clasificación incorpora el código de error, el diagnóstico la causa raíz y la resolución la solución aplicada. Al final, el estado contiene el historial completo del proceso.
+### Despliegue
 
-### Nodos
+- **Flask** expone el workflow de LangGraph como API: cada solicitud lanza una ejecución nueva o reanuda un estado persistente (sin estado de cara al cliente, con estado en el backend). Va detrás de un balanceador.
+- **Docker** empaqueta cada instancia con sus dependencias; **Kubernetes** automatiza despliegue, **autoescalado** y **autorreparación**.
 
-Los nodos son operaciones discretas del flujo, como extraer un código de error de una captura, buscar una solución o generar una respuesta para el cliente. Reciben el estado, ejecutan una acción y devuelven el estado actualizado.
+| Escalado | Ventajas | Encaja en |
+|---|---|---|
+| **Edge** (cerca de los datos) | Menor latencia, más privacidad | Decisiones locales, cumplimiento estricto |
+| **Nube** | Escalado elástico, monitorización unificada | Cómputo centralizado, alcance global |
 
-Los nodos no se comunican directamente: intercambian información a través del estado. Esta separación permite añadir, eliminar o modificar nodos sin romper el resto del grafo.
+Lo habitual es un **sistema híbrido**. Diseñar desde el principio pensando en resiliencia, observabilidad y escalabilidad.
 
-Cada nodo debe tener un único propósito. Separar triaje, diagnóstico y resolución hace que cada operación sea más clara, fácil de probar y mantenible.
+### Integración final
 
-### Enrutamiento condicional
+Un agente completo tiene seis capas: **entrada** (multimodal) → **razonamiento** (LangGraph) → **herramientas** → **memoria** (LTM, vectores) → **gobernanza** → **interfaz de despliegue**. El estado compartido del grafo las conecta.
 
-El enrutamiento estático siempre sigue la misma ruta; el condicional elige el siguiente nodo según lo que haya detectado el anterior:
+- **Validación:** inspección de estado, sesiones de usuario simuladas y pruebas de estrés; los logs de gobernanza ayudan a depurar.
+- **Próximos pasos:** reentrenamiento dinámico con feedback real, **meta-orquestación** (agentes que coordinan agentes) y escalado predictivo.
 
-- Gravedad alta: ruta urgente.
-- Gravedad baja: ruta estándar.
-- `AUTH_FAIL`: especialista en autenticación.
-- `DB_TIMEOUT`: especialista en bases de datos.
+La autonomía no sale de un único modelo potente, sino de la **interacción de componentes estructurados**.
 
-Las condiciones leen el estado y determinan el siguiente paso. También pueden crear bucles: si el diagnóstico no encuentra una solución, el flujo vuelve al triaje con una nota que solicita un análisis más profundo. De este modo, el grafo se adapta a lo que funciona y a lo que necesita repetirse.
+## 4. Proyecto práctico
 
-## Orquestación, gobernanza y ampliación
-
-### Fundamentos de la gobernanza
-
-Cuando los agentes toman decisiones con efectos reales, la gobernanza mantiene la confianza, la fiabilidad y el cumplimiento normativo. En LangGraph, cada nodo puede enviar alertas, modificar datos o activar flujos de trabajo, por lo que las acciones deben estar sujetas a controles explícitos.
-
-La gobernanza incluye:
-
-- Reglas que definen qué acciones están permitidas.
-- Puntos de control que validan el estado antes de ejecutar.
-- Registro de entradas, salidas y decisiones.
-- Supervisión humana para acciones sensibles.
-- Métricas de acciones, errores y cambios realizados.
-
-Los nodos de control pueden bloquear, pausar o redirigir el grafo cuando detectan una infracción o un estado inseguro.
-
-### Guardrail para acciones irreversibles
-
-Una **barrera contra acciones irreversibles** intercepta acciones críticas, como eliminar registros, transferir fondos o ejecutar comandos, antes de que se realicen sin autorización.
-
-El guardrail combina:
-
-1. Validaciones automáticas.
-2. Comprobación de políticas.
-3. Pausa del flujo.
-4. Aprobación explícita mediante un nodo supervisor o un operador humano.
-5. Reanudación, rechazo o redirección según la decisión.
-
-La barrera debe aplicarse a cualquier nodo que intente modificar datos de producción o ejecutar una operación de alto riesgo.
-
-### Gobernanza de datos y auditabilidad
-
-Cada transición de estado y ejecución de nodo debe generar un registro de auditoría. Estos registros permiten:
-
-- Reconstruir cómo llegó el agente a una decisión.
-- Verificar qué entradas y salidas participaron.
-- Demostrar cumplimiento de políticas y normativas.
-- Diagnosticar incidentes y corregir lógica defectuosa.
-
-Los paneles de control pueden mostrar en tiempo real la frecuencia de acciones, las tasas de error y las modificaciones realizadas por usuarios o agentes.
-
-### Human-in-the-loop (HITL)
-
-Los nodos de traspaso manual son puntos de pausa estructurados. El operador puede revisar las variables de estado, validar el razonamiento y aportar correcciones antes de reanudar el flujo.
-
-Los ejercicios de gobernanza implementan un guardrail de acciones irreversibles y un nodo HITL para demostrar que la automatización puede continuar siendo eficiente sin perder control humano ni responsabilidad.
-
-### De prototipo a producción
-
-La combinación de comprobaciones automáticas, aprobación humana y registros transparentes transforma un prototipo experimental en un sistema listo para producción. Este marco de autonomía responsable permite escalar agentes regulados y auditables hacia despliegues empresariales.
+[`assignments/multimodal-support-agent`](assignments/multimodal-support-agent): demo de un agente de soporte con texto e imágenes simuladas, recuperación de casos pasados (JSON), herramientas simuladas, memoria de sesión, audit log y API Flask. El código del curso es una versión simplificada: el orquestador usa reglas por palabras clave, no un grafo de LangGraph completo.
